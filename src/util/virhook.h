@@ -56,6 +56,7 @@ typedef enum {
     VIR_HOOK_QEMU_OP_PREPARE,          /* domain startup initiated */
     VIR_HOOK_QEMU_OP_RELEASE,          /* domain destruction is over */
     VIR_HOOK_QEMU_OP_MIGRATE,          /* domain is being migrated */
+    VIR_HOOK_QEMU_OP_PRESWITCHOVER,    /* domain is about to switchover to destination */
     VIR_HOOK_QEMU_OP_STARTED,          /* domain has started */
     VIR_HOOK_QEMU_OP_RECONNECT,        /* domain is being reconnected by libvirt */
     VIR_HOOK_QEMU_OP_ATTACH,           /* domain is being attached to be libvirt */

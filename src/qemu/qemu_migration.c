@@ -5191,6 +5191,31 @@ qemuMigrationSrcRun(virQEMUDriver *driver,
             goto error;
     }
 
+    /* A hook after the migration finished for custom operation before
+       resuming switching over the domain to destination. Enables custom
+       code to run at pre-switchover state */
+    if (virHookPresent(VIR_HOOK_DRIVER_QEMU)) {
+        g_autofree char *xml = NULL;
+        int hookret;
+
+        if (!(xml = qemuDomainDefFormatXML(driver, NULL, vm->def, 0)))
+            goto error;
+
+        VIR_DEBUG("preswitchover hook for domain %s", vm->def->name);
+
+        hookret = virHookCall(VIR_HOOK_DRIVER_QEMU, vm->def->name,
+                              VIR_HOOK_QEMU_OP_PRESWITCHOVER,
+                              VIR_HOOK_SUBOP_NONE,
+                              NULL, xml, NULL);
+
+        if (hookret < 0) {
+            virReportError(VIR_ERR_HOOK_SCRIPT_FAILED,
+                          "%s",
+                          "preswitchover hook failed");
+            goto error;
+        }
+    }
+
     if (mig->nbd &&
         qemuMigrationSrcNBDCopyCancel(vm, false,
                                       VIR_ASYNC_JOB_MIGRATION_OUT,
